@@ -1,0 +1,399 @@
+﻿@model LocalizaCEP.Controllers.HomeController;
+@{
+    ViewData["Title"] = "Home Page";
+    IList<LocalizaCEP.Models.Endereco> lista = ViewBag.ListaEndereco;
+}
+
+<div>
+    <div class="row">
+        <div class="container col-4">
+            <h3 class="align-content-center">Buscar CEP</h3>
+            <form class="border-top" id="formCep" method="post">
+                <div class="row">
+                    <div class="form-group  col-6">
+                        <label for="cep">CEP</label>
+                        <input onkeyup="buscaEndereco()" asp-for="@Model.endereco.Cep" placeholder="Ex.: 15345678" type="number" class="form-control" id="cep">
+                    </div>
+                    <div class="container text-primary">
+                        <p>"Digite os 8 números do CEP,<br/>
+                            click fora da caixa acima e aguarde. :D"</p>
+                    </div>
+                  
+                </div>
+                <div class="row">
+                    <div class="form-group  col-10">
+                        <label for="rua">Rua</label>
+                        <input asp-for="@Model.endereco.Rua" type="text" value="" class="form-control" id="rua">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group  col-10">
+                        <label for="numero">Número</label>
+                        <input  asp-for="@Model.endereco.Numero" type="number" class="form-control" id="numero">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group  col-10">
+                        <label for="bairro">Bairro</label>
+                        <input asp-for="@Model.endereco.Bairro" type="text" class="form-control" id="bairro">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-10">
+                        <label for="cidade">Cidade</label>
+                        <input asp-for="@Model.endereco.Cidade" type="text" class="form-control" id="cidade">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-10 text-center">
+                        <button type="submit" class="btn btn-primary">Salvar Endereço</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="border-left col-8">
+            <h3 class="text-center">Lista de Endereços</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Rua</th>
+                        <th scope="col">Número</th>
+                        <th scope="col">Cep</th>
+                        <th scope="col">Bairro</th>
+                        <th scope="col">Cidade</th>
+                        <th scope="col">Opções</th>
+                    </tr>
+                </thead>
+                <tbody id="TabelaEndereco">
+                    @{
+                        foreach (var item in ViewBag.ListaEndereco)
+                        {
+                            <tr>
+                                <td hidden="hidden">@item._Id</td>
+                                <td>
+                                    @item.Rua
+                                </td>
+                                <td>
+                                    @item.Numero
+
+                                </td>
+                                <td>
+                                    @item.Cep
+                                </td>
+                                <td>
+                                    @item.Bairro
+                                </td>
+                                <td>
+                                    @item.Cidade
+                                </td>
+                                <td>
+                                    <a href="#" onclick="EditarEndereco('@item._Id','@item.Rua','@item.Numero', '@item.Bairro','@item.Cep', '@item.Cidade')" data-toggle="modal" data-target="#modalEdit">Editar</a>
+                                    <a href="#" onclick="DeletarEndereco('@item._Id','@item.Rua','@item.Numero', '@item.Bairro','@item.Cep', '@item.Cidade')" data-toggle="modal" data-target="#modalDelete">Excluir</a>
+
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Edição-->
+<div class="modal fade align-content-center" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modalTitleEdit" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header ">
+                <h5 class="modal-title " id="modalTitleEdit">Editar Endereço</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="formCepEdicao" method="put">
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <input asp-for="@Model.endereco._Id" hidden="hidden" id="idFormEditar">
+                            <label for="cep">CEP</label>
+                            <input asp-for="@Model.endereco.Cep" placeholder="Ex.: 15345678" type="number" class="form-control" id="cepFormEditar">
+                        </div>
+                        <div class=" form-group col-6">
+                            <label for="rua">Cidade</label>
+                            <input asp-for="@Model.endereco.Cidade" type="text" value="" class="form-control" id="cidadeFormEditar">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group  col-12">
+                            <label for="numero">Número</label>
+                            <input asp-for="@Model.endereco.Numero" type="number" class="form-control" id="numeroFormEditar">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group  col-12">
+                            <label for="bairro">Bairro</label>
+                            <input asp-for="@Model.endereco.Bairro" type="text" class="form-control" id="bairroFormEditar">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-12">
+                            <label for="cidade">Rua</label>
+                            <input asp-for="@Model.endereco.Rua" type="text" class="form-control" id="ruaFormEditar">
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" onclick="SalvarEdicao()" data-dismiss="modal" class="btn btn-primary">Salvar Endereço</button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal Deletar-->
+<div class="modal fade align-content-center" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="modalTitleDelete" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-light ">
+                <h5 class="modal-title " id="modalTitleDelete">Deseja realmente deletar este endereço?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form id="formCepDelete" method="delete">
+                    <div class="row">
+                        <div class="form-group col-6">
+                            <input asp-for="@Model.endereco._Id" hidden="hidden" id="idFormDel">
+                            <label for="cep">CEP</label>
+                            <input disabled="disabled" asp-for="@Model.endereco.Cep" placeholder="Ex.: 15345678" type="number" class="form-control" id="cepFormDel">
+                        </div>
+                        <div class=" form-group col-6">
+                            <label for="rua">Cidade</label>
+                            <input disabled="disabled" asp-for="@Model.endereco.Cidade" type="text" value="" class="form-control" id="cidadeFormDel">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group  col-12">
+                            <label for="numero">Número</label>
+                            <input disabled="disabled" asp-for="@Model.endereco.Numero" type="number" class="form-control" id="numeroFormDel">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group  col-12">
+                            <label for="bairro">Bairro</label>
+                            <input disabled="disabled" asp-for="@Model.endereco.Bairro" type="text" class="form-control" id="bairroFormDel">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-12">
+                            <label for="cidade">Rua</label>
+                            <input disabled="disabled" asp-for="@Model.endereco.Rua" type="text" class="form-control" id="ruaFormDel">
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger" onclick="ConfirmarDelecao()" data-dismiss="modal" >Deletar Endereço</button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function buscaEndereco() {
+
+            if (document.getElementById("cep").value.length == 8) {
+                var cep = document.getElementById("cep").value;
+                var url = "/Home/getEndereco?c=" + cep;
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        alert("Aguardade, as informações já estão chegando! :)");
+                        var endereco = JSON.parse(this.response);
+                        document.getElementById("rua").value = endereco.logradouro;
+                        document.getElementById("bairro").value = endereco.bairro;
+                        document.getElementById("cidade").value = endereco.localidade;
+                        document.getElementById("numero").focus();
+
+                    }
+                };
+                xhttp.open("GET", url, true);
+                xhttp.send();
+            }
+
+        }
+
+        function EditarEndereco(id, rua, numero, bairro, cep, cidade) {
+
+            document.getElementById('idFormEditar').value = id;
+            document.getElementById('ruaFormEditar').value = rua;
+            document.getElementById('bairroFormEditar').value = bairro;
+            document.getElementById('cepFormEditar').value = cep;
+            document.getElementById('cidadeFormEditar').value = cidade;
+            document.getElementById('numeroFormEditar').value = numero;
+        }
+
+        $('#formCep').submit(function (e) {
+            e.preventDefault();
+            var form = $('#formCep').serialize();
+
+            $.ajax({
+                url: 'Home/Cadastrar',
+                type: "POST",
+                headers: { "RequestVerificationToken": $('#formCep input[name="__RequestVerificationToken"]').val() },
+                data: form,
+                success: function (data, textStatus, xhr) {
+                    if (xhr.status != 200)
+                        alert("Ocorreu um erro ao salvar o registro!");
+                    else {
+                        var innerHtml;
+                        document.getElementById('cep').value = "";
+                        document.getElementById('rua').value = "";
+                        document.getElementById('numero').value = "";
+                        document.getElementById('bairro').value = "";
+                        document.getElementById('cidade').value = "";
+
+                        $.each(JSON.parse(data), function (i, val) {
+
+                            $('#TabelaEndereco').html('');
+                            innerHtml += '<tr>';
+                            $.each(val, function (name, value) {
+                                if (name != "_Id") {
+                                    innerHtml += "<td>" + value + "</td>"
+                                }
+
+                            });
+
+                            innerHtml += "<td>";
+                            innerHtml += "<a href=\"#\" class=\"\" data-toggle=\"modal\" data-target=\"#modalEdit\" onclick=\"EditarEndereco('" + val._Id + "', '" + val.Rua + "', '" + val.Numero + "', '" + val.Bairro + "', '" + val.Cep + "', '" + val.Cidade + "')\">Editar</a>";
+                            innerHtml += " ";
+
+                            innerHtml += "<a href=\"#\" class=\"\" data-toggle=\"modal\" data-target=\"#modalDelete\" onclick=\"DeletarEndereco('" + val._Id + "', '" + val.Rua + "', '" + val.Numero + "', '" + val.Bairro + "', '" + val.Cep + "', '" + val.Cidade + "')\">Deletar</a>";
+                            innerHtml += "</td>";
+                            innerHtml += '</tr>';
+                        });
+
+                        $('#TabelaEndereco').html(innerHtml);
+                    }
+
+
+
+                },
+                error: function (data) { alert("Ocorreu um erro ao inserir os dados!"); }
+            });
+        });
+
+        function SalvarEdicao() {
+
+            var form = $('#formCepEdicao').serialize();
+            $.ajax({
+                url: 'Home/EditarEndereco',
+                type: "PUT",
+                headers: { "RequestVerificationToken": $('#formCepEdicao input[name="__RequestVerificationToken"]').val() },
+                data: form,
+                success: function (data, textStatus, xhr) {
+                    if (xhr.status != 200) {
+                        alert("Ocorreu um erro ao editar o endereço!");
+                    }
+
+                    else {
+                        alert("Edição salva com sucesso!");
+                        var innerHtml;
+
+                        $.each(JSON.parse(data), function (i, val) {
+                            $('#TabelaEndereco').html('');
+                            innerHtml += '<tr>';
+                            $.each(val, function (name, value) {
+                                if (name != "_Id") {
+                                    innerHtml += "<td>" + value + "</td>"
+                                }
+
+                            })
+                            innerHtml += "<td>";
+                            innerHtml += "<a href=\"#\" class=\"\" data-toggle=\"modal\" data-target=\"#modalEdit\" onclick=\"EditarEndereco('" + val._Id + "', '" + val.Rua + "', '" + val.Numero + "', '" + val.Bairro + "', '" + val.Cep + "', '" + val.Cidade + "')\">Editar</a>";
+                            innerHtml += " ";
+
+                            innerHtml += "<a href=\"#\" class=\"\" data-toggle=\"modal\" data-target=\"#modalDelete\" onclick=\"DeletarEndereco('" + val._Id + "', '" + val.Rua + "', '" + val.Numero + "', '" + val.Bairro + "', '" + val.Cep + "', '" + val.Cidade + "')\">Deletar</a>";
+                            innerHtml += "</td>";
+                            innerHtml += '</tr>';
+                        });
+                        $('#TabelaEndereco').html(innerHtml);
+                    }
+                }
+            })
+
+        }
+
+        function DeletarEndereco(id, rua, numero, bairro, cep, cidade) {
+
+            document.getElementById('idFormDel').value = id;
+            document.getElementById('ruaFormDel').value = rua;
+            document.getElementById('bairroFormDel').value = bairro;
+            document.getElementById('cepFormDel').value = cep;
+            document.getElementById('cidadeFormDel').value = cidade;
+            document.getElementById('numeroFormDel').value = numero;
+        }
+
+        function ConfirmarDelecao() {
+
+            var form = $('#formCepDelete').serialize();
+
+            $.ajax({
+                url: 'Home/DeletarEndereco',
+                type: "DELETE",
+                headers: { "RequestVerificationToken": $('#formCepDelete input[name="__RequestVerificationToken"]').val() },
+                data: form,
+                success: function (data, textStatus, xhr) {
+                    if (xhr.status != 200) {
+                        alert("Ocorreu um erro ao deletar o endereço!");
+                    }
+
+                    else {
+                        alert("Endereço deletado!");
+                        var innerHtml;
+
+                        $.each(JSON.parse(data), function (i, val) {
+                            $('#TabelaEndereco').html('');
+                            innerHtml += '<tr>';
+                            $.each(val, function (name, value) {
+                                if (name != "_Id") {
+                                    innerHtml += "<td>" + value + "</td>"
+                                }
+
+                            })
+                            innerHtml += "<td>";
+                            innerHtml += "<a href=\"#\" class=\"\" data-toggle=\"modal\" data-target=\"#modalEdit\" onclick=\"EditarEndereco('" + val._Id + "', '" + val.Rua + "', '" + val.Numero + "', '" + val.Bairro + "', '" + val.Cep + "', '" + val.Cidade + "')\">Editar</a>";
+                            innerHtml += " ";
+
+                            innerHtml += "<a href=\"#\" class=\"\" data-toggle=\"modal\" data-target=\"#modalDelete\" onclick=\"DeletarEndereco('" + val._Id + "', '" + val.Rua + "', '" + val.Numero + "', '" + val.Bairro + "', '" + val.Cep + "', '" + val.Cidade + "')\">Deletar</a>";
+                            innerHtml += "</td>";
+                            innerHtml += '</tr>';
+                        });
+                        $('#TabelaEndereco').html(innerHtml);
+                    }
+                }
+            })
+
+        }
+
+    </script>
+
+}
